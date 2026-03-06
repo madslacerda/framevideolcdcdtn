@@ -1,6 +1,7 @@
 streamlit
-OpenCV-Python
+opencv-python
 os
 tempfile zipfile
+
 
 
