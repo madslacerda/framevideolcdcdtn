@@ -1,6 +1,6 @@
 import streamlit as st
 import os
-import OpenCV-Python
+import opencv-python
 import tempfile
 import zipfile
 
@@ -75,6 +75,7 @@ if video_file is not None:
 
 
             st.success("Extração concluída.")
+
 
 
 
