@@ -1,8 +1,8 @@
 streamlit
-opencv-python-headless
+opencv-python
 numpy
-os
-tempfile zipfile
+Pillow
+
 
 
 
