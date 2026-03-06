@@ -1,5 +1,5 @@
 import streamlit as st
-#import cv2
+import cv2
 import os
 import tempfile
 import zipfile
@@ -72,5 +72,6 @@ if video_file is not None:
                     file_name="frames.zip",
                     mime="application/zip"
                 )
+
 
             st.success("Extração concluída.")
