@@ -3,6 +3,7 @@ import cv2
 import os
 import tempfile
 import zipfile
+import numpy as np
 
 st.title("Extração de Frames de Vídeo")
 
@@ -75,6 +76,7 @@ if video_file is not None:
 
 
             st.success("Extração concluída.")
+
 
 
 
