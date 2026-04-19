@@ -5,36 +5,36 @@ import tempfile
 import zipfile
 import numpy as np
 
-st.title("Extração de Frames de Vídeo")
+st.title("Video Frame Extraction")
 
-st.write("Faça upload de um vídeo e extraia frames em intervalos definidos.")
+st.write("Upload a video and extract frames at user-defined time intervals.")
 
 video_file = st.file_uploader(
-    "Selecione o vídeo",
+    "Select a video file",
     type=["mp4", "avi", "mov", "mkv"]
 )
 
-tempo_inicial = st.number_input(
-    "Tempo inicial (s)",
+start_time = st.number_input(
+    "Initial time (s)",
     min_value=0.0,
     value=0.0
 )
 
-intervalo = st.number_input(
-    "Intervalo entre frames (s)",
+interval = st.number_input(
+    "Frame interval (s)",
     min_value=0.1,
     value=1.0
 )
 
 num_frames = st.number_input(
-    "Número de frames",
+    "Number of frames",
     min_value=1,
     value=10
 )
 
 if video_file is not None:
 
-    # salvar vídeo temporário
+    # Save uploaded video temporarily
     tfile = tempfile.NamedTemporaryFile(delete=False, suffix=".mp4")
     tfile.write(video_file.read())
     tfile.close()
@@ -42,48 +42,48 @@ if video_file is not None:
     video = cv2.VideoCapture(tfile.name)
 
     if not video.isOpened():
-        st.error("Erro ao abrir o vídeo.")
+        st.error("Error opening video file.")
     else:
 
         fps = video.get(cv2.CAP_PROP_FPS)
 
         if fps == 0:
-            st.error("Não foi possível detectar FPS do vídeo.")
+            st.error("Unable to detect video FPS.")
         else:
 
-            pasta_saida = tempfile.mkdtemp()
+            output_folder = tempfile.mkdtemp()
 
-            frames_salvos = []
+            saved_frames = []
 
-            if st.button("Extrair Frames"):
+            if st.button("Extract Frames"):
 
                 progress = st.progress(0)
 
                 for i in range(int(num_frames)):
 
-                    tempo_atual = tempo_inicial + i * intervalo
-                    numero_frame = int(tempo_atual * fps)
+                    current_time = start_time + i * interval
+                    frame_number = int(current_time * fps)
 
-                    video.set(cv2.CAP_PROP_POS_FRAMES, numero_frame)
+                    video.set(cv2.CAP_PROP_POS_FRAMES, frame_number)
 
-                    sucesso, frame = video.read()
+                    success, frame = video.read()
 
-                    if not sucesso:
-                        st.warning(f"Frame não encontrado em {tempo_atual:.2f}s")
+                    if not success:
+                        st.warning(f"Frame not found at {current_time:.2f} s")
                         continue
 
-                    nome_arquivo = os.path.join(
-                        pasta_saida,
+                    filename = os.path.join(
+                        output_folder,
                         f"frame_{i+1}.jpg"
                     )
 
-                    cv2.imwrite(nome_arquivo, frame)
+                    cv2.imwrite(filename, frame)
 
-                    frames_salvos.append(nome_arquivo)
+                    saved_frames.append(filename)
 
                     st.image(
                         frame,
-                        caption=f"Frame {i+1} ({tempo_atual:.2f}s)",
+                        caption=f"Frame {i+1} ({current_time:.2f} s)",
                         channels="BGR"
                     )
 
@@ -91,20 +91,20 @@ if video_file is not None:
 
                 video.release()
 
-                # criar ZIP
-                zip_path = os.path.join(pasta_saida, "frames.zip")
+                # Create ZIP file
+                zip_path = os.path.join(output_folder, "frames.zip")
 
                 with zipfile.ZipFile(zip_path, "w") as zipf:
-                    for f in frames_salvos:
+                    for f in saved_frames:
                         zipf.write(f, os.path.basename(f))
 
                 with open(zip_path, "rb") as f:
 
                     st.download_button(
-                        label="Baixar frames (ZIP)",
+                        label="Download frames (ZIP)",
                         data=f,
                         file_name="frames.zip",
                         mime="application/zip"
                     )
 
-                st.success("Extração concluída.")
+                st.success("Extraction completed successfully.")
